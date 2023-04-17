@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "370338493289",
+    "project_id": "chicoguesser",
+    "storage_bucket": "chicoguesser.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:370338493289:android:98ead1c3641ced1ace83f8",
+        "android_client_info": {
+          "package_name": "com.example.chicoguesser"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "370338493289-qpj2p6drctj85o71oacmg2t2sp957bmp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMObjwzFSKy5qEAMjSLfwiWtFAT-VDTcY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "370338493289-qpj2p6drctj85o71oacmg2t2sp957bmp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
