@@ -1,61 +1,115 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'firebase_options.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      title: 'ChicoGuesser',
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomeScreen(),
+        '/play': (context) => PlayScreen(),
+        '/upload': (context) => UploadScreen(),
+        '/leaderboard': (context) => LeaderboardScreen(),
+      },
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int num=0;
-  void add(){
-    num++;
-  }
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: const Text('ChicoGuesser!'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
+          children: [
             const Text(
-              'Welcome to CHICOGUESSER',
+              'ChicoGuesser!',
+              style: TextStyle(
+                fontSize: 40,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            FloatingActionButton(
-              onPressed: add,
-              tooltip: "Play button",
-              child: const Icon(Icons.play_circle),  
+            SizedBox(height: 50),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/play');
+              },
+              child: Text('Play'),
             ),
-            FloatingActionButton(
-              onPressed: add,
-              tooltip: "Add image",
-              child: const Icon(Icons.camera_alt_rounded),
-            )
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/upload');
+              },
+              child: Text('Upload'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/leaderboard');
+              },
+              child: const Text('Leaderboard'),
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class PlayScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Play'),
+      ),
+      body: const Center(
+        child: Text('This is the Play screen.'),
+      ),
+    );
+  }
+}
+
+class UploadScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Upload'),
+      ),
+      body: const Center(
+        child: Text('This is the Upload screen.'),
+      ),
+    );
+  }
+}
+
+class LeaderboardScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Leaderboard'),
+      ),
+      body: const Center(
+        child: Text('This is the Leaderboard screen.'),
       ),
     );
   }
