@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:chicoguesser/leaderboard.dart';
 import 'package:chicoguesser/play.dart';
 import 'package:chicoguesser/upload.dart';
-import 'package:chicoguesser/colors.dart';
+import 'package:chicoguesser/profile.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -11,33 +11,43 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          //title: const Text('ChicoGuesser'),
-          ),
+        shadowColor: Colors.black,
+        title: const Text('ChicoGuesser'),
+        centerTitle: true,
+        actions: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: GestureDetector(
+                onTap: () {
+                  Navigator.push<void>(
+                    context,
+                    MaterialPageRoute<void>(
+                        builder: (BuildContext context) =>
+                            const ProfileScreen()),
+                  );
+                },
+                child: const Icon(
+                  Icons.person_sharp,
+                  size: 26.0,
+                )),
+          )
+        ],
+      ),
       body: Container(
         height: double.infinity,
         width: double.infinity,
         decoration: BoxDecoration(
             image: DecorationImage(
           fit: BoxFit.cover,
-          image: const AssetImage('images/main.jpg'),
+          image: const AssetImage('assets/main.jpg'),
           colorFilter: ColorFilter.mode(
               Colors.white.withOpacity(0.5), BlendMode.modulate),
         )),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(
-              width: 150.0,
-              height: 300.0,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.rectangle,
-                ),
-              ),
-            ),
             const Text(
-              'ChicoGuesser!',
+              'Welcome',
               style: TextStyle(
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
