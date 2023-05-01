@@ -32,10 +32,18 @@ class PlayScreen extends StatelessWidget {
         ),
         body: Center(
           child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
+                const Expanded(
+                    flex: 0,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Guess',
+                      ),
+                    )),
                 Expanded(
-                  flex: 1,
+                  flex: 10,
                   child: StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection('photos')
@@ -64,14 +72,6 @@ class PlayScreen extends StatelessWidget {
                       }
                     },
                   ),
-                ),
-                const Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Guess',
-                    ),
-                  )
                 ),
               ]),
         ));
