@@ -4,8 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:chicoguesser/profile.dart';
 
-class PlayScreen extends StatelessWidget {
+class PlayScreen extends StatefulWidget {
   const PlayScreen({super.key});
+
+  @override
+  State<PlayScreen> createState() => _PlayScreenState();
+}
+
+class _PlayScreenState extends State<PlayScreen> {
+  int points=0;
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +80,11 @@ class PlayScreen extends StatelessWidget {
                     },
                   ),
                 ),
+                BottomAppBar(
+                  child: Text(
+                    "$points"
+                  ),
+                )
               ]),
         ));
   }
