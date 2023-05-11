@@ -12,7 +12,7 @@ class PlayScreen extends StatefulWidget {
 }
 
 class _PlayScreenState extends State<PlayScreen> {
-  int points=0;
+  int points = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +82,11 @@ class _PlayScreenState extends State<PlayScreen> {
                 ),
                 BottomAppBar(
                   child: Text(
-                    "$points"
+                    "Score: $points",
+                    style: const TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 )
               ]),
