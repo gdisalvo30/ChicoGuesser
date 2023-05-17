@@ -14,6 +14,7 @@ class PlayScreen extends StatefulWidget {
 class _PlayScreenState extends State<PlayScreen> {
   int points = 0;
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,14 +42,19 @@ class _PlayScreenState extends State<PlayScreen> {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                const Expanded(
-                    flex: 0,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Guess',
-                      ),
-                    )),
+                Expanded(
+                  flex: 0,
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                      icon: Icon(Icons.accessible_outlined),
+                      hintText: 'What do you see?',
+                      labelText: 'Guess',
+                    ),
+                    validator: (String? value) {
+                      return (value == null) ? 'no blank allowed' : null;
+                    },
+                  ),
+                ),
                 Expanded(
                   flex: 10,
                   child: StreamBuilder(
@@ -70,7 +76,7 @@ class _PlayScreenState extends State<PlayScreen> {
                                   Random random;
                                   random = Random();
                                   index = random
-                                      .nextInt(snapshot.data!.docs.length);
+                                      .nextInt(snapshot.data!.docs.length+1);
                                   return photoWidget(snapshot, index);
                                 },
                               ),
@@ -84,7 +90,7 @@ class _PlayScreenState extends State<PlayScreen> {
                   child: Text(
                     "Score: $points",
                     style: const TextStyle(
-                      fontSize: 30,
+                      fontSize: 50,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
