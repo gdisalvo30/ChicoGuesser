@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:chicoguesser/profile.dart';
+import 'package:location/location.dart';
 
 class UploadScreen extends StatefulWidget {
   const UploadScreen({Key? key}) : super(key: key);
@@ -44,10 +45,28 @@ class _UploadScreenState extends State<UploadScreen> {
     await uploadTask.whenComplete(() async {
       String downloadURL = await ref.getDownloadURL();
 
-      FirebaseFirestore.instance.collection('photos').add({
-        'downloadURL': downloadURL,
-        'name': fileName,
-      });
+      // Get current location
+      Location location = Location();
+      LocationData? currentLocation;
+      try {
+        currentLocation = await location.getLocation();
+      } catch (e) {
+        print('Error getting current location: $e');
+      }
+
+      if (currentLocation != null) {
+        double latitude = currentLocation.latitude!;
+        double longitude = currentLocation.longitude!;
+
+        FirebaseFirestore.instance.collection('photos').add({
+          'downloadURL': downloadURL,
+          'name': fileName,
+          'latitude': latitude,
+          'longitude': longitude,
+        });
+      } else {
+        print('Unable to get current location.');
+      }
     });
   }
 

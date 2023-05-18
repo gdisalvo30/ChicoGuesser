@@ -1,4 +1,5 @@
 import 'package:chicoguesser/home.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -104,6 +105,20 @@ class _LoginScreenState extends State<LoginScreen> {
         email: email,
         password: password,
       );
+      // Extract the 'id' from the email
+      String id = email.split('@')[0];
+
+      // Create a Firestore document for the user
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
+        'id': id,
+        'score': 0,
+        'email': email,
+
+        // Add more fields as needed
+      });
 
       // If the registration is successful, navigate to the home screen.
       Navigator.pushReplacement(
