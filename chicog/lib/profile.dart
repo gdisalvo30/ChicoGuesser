@@ -52,8 +52,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(Icons.camera_alt),
-              title: Text('Capture Image'),
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Capture Image'),
               onTap: () {
                 // Capture an image from the camera
                 Navigator.pop(context);
@@ -61,8 +61,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.photo_library),
-              title: Text('Select Image'),
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Select Image'),
               onTap: () {
                 // Select an image from the gallery
                 Navigator.pop(context);
@@ -112,25 +112,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Update Username'),
+          title: const Text('Update Username'),
           content: TextField(
             onChanged: (value) {
               setState(() {
                 _newUsername = value;
               });
             },
-            decoration: InputDecoration(hintText: 'Enter new username'),
+            decoration: const InputDecoration(hintText: 'Enter new username'),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // Close the dialog
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: _updateUsername,
-              child: Text('Update'),
+              child: const Text('Update'),
             ),
           ],
         );
@@ -221,7 +221,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Score: $score',
+                    'High Score: $score',
                     style: const TextStyle(fontSize: 18),
                     textAlign: TextAlign.center,
                   ),
