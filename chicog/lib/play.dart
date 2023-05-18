@@ -1,80 +1,137 @@
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:chicoguesser/profile.dart';
 
 class PlayScreen extends StatefulWidget {
-  const PlayScreen({Key? key}) : super(key: key);
+  const PlayScreen({super.key});
 
   @override
-  _PlayScreenState createState() => _PlayScreenState();
+  State<PlayScreen> createState() => _PlayScreenState();
 }
 
 class _PlayScreenState extends State<PlayScreen> {
-  late List<String> _imageUrls= [];
-  FirebaseStorage storage = FirebaseStorage.instance;
+  int points = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _getImageUrls();
-  }
-
-  void _getImageUrls() async {
-    ListResult result = await storage.ref().listAll();
-    List<String> urls = [];
-    for (Reference ref in result.items) {
-      String url = await ref.getDownloadURL();
-      urls.add(url);
-    }
-    setState(() {
-      _imageUrls = urls;
-    });
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: 10.0),
-            child: GestureDetector(
-                onTap: () {
-                  Navigator.push<void>(
-                    context,
-                    MaterialPageRoute<void>(
-                        builder: (BuildContext context) =>
-                            const ProfileScreen()),
-                  );
-                },
-                child: const Icon(
-                  Icons.person_sharp,
-                  size: 26.0,
-                )),
-          )
-        ],
-      ),
-      body: _imageUrls.isEmpty
-          ? const Center(
-              child: CircularProgressIndicator(),
+        appBar: AppBar(
+          actions: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(right: 10.0),
+              child: GestureDetector(
+                  onTap: () {
+                    Navigator.push<void>(
+                      context,
+                      MaterialPageRoute<void>(
+                          builder: (BuildContext context) =>
+                              const ProfileScreen()),
+                    );
+                  },
+                  child: const Icon(
+                    Icons.person_sharp,
+                    size: 26.0,
+                  )),
             )
-          : ListView.builder(
-              itemCount: _imageUrls.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  child: Column(
-                    children: [
-                      Image.network(
-                        _imageUrls[index],
-                        width: 300,
-                        height: 300,
+          ],
+        ),
+        body: Center(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                const Expanded(
+                    flex: 0,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Guess',
                       ),
-                      const SizedBox(height: 10),
-                      Text(_imageUrls[index]),
-                    ],
+                    )),
+                Expanded(
+                  flex: 10,
+                  child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('photos')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.waiting:
+                          return const CircularProgressIndicator();
+                        default:
+                          if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            return Expanded(
+                              child: ListView.builder(
+                                itemCount: 1,
+                                itemBuilder: (context, index) {
+                                  Random random;
+                                  random = Random();
+                                  index = random
+                                      .nextInt(snapshot.data!.docs.length);
+                                  return photoWidget(snapshot, index);
+                                },
+                              ),
+                            );
+                          }
+                      }
+                    },
                   ),
-                );
-              },
-            ),
+                ),
+                BottomAppBar(
+                  child: Text(
+                    "Score: $points",
+                    style: const TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              ]),
+        ));
+  }
+}
+
+List<Widget> curImage() {
+  return <Widget>[
+    StreamBuilder(
+      stream: FirebaseFirestore.instance.collection('photos').snapshots(),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return const CircularProgressIndicator();
+          default:
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              return Expanded(
+                child: ListView.builder(
+                  itemCount: 1,
+                  itemBuilder: (context, index) {
+                    Random random;
+                    random = Random();
+                    index = random.nextInt(snapshot.data!.docs.length);
+                    return photoWidget(snapshot, index);
+                  },
+                ),
+              );
+            }
+        }
+      },
+    )
+  ];
+}
+
+Widget photoWidget(AsyncSnapshot<QuerySnapshot> snapshot, int index) {
+  try {
+    return Column(
+      children: [
+        Image.network(snapshot.data!.docs[index]['downloadURL']),
+      ],
     );
+  } catch (e) {
+    return Text('Error: $e');
   }
 }
