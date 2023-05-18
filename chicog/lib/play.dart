@@ -13,6 +13,7 @@ class PlayScreen extends StatefulWidget {
 
 class _PlayScreenState extends State<PlayScreen> {
   int points = 0;
+  String imagename='';
 
 
   @override
@@ -76,7 +77,8 @@ class _PlayScreenState extends State<PlayScreen> {
                                   Random random;
                                   random = Random();
                                   index = random
-                                      .nextInt(snapshot.data!.docs.length+1);
+                                      .nextInt(snapshot.data!.docs.length);
+                                  imagename=(snapshot.data!.docs[index]['name']);
                                   return photoWidget(snapshot, index);
                                 },
                               ),
@@ -98,36 +100,6 @@ class _PlayScreenState extends State<PlayScreen> {
               ]),
         ));
   }
-}
-
-List<Widget> curImage() {
-  return <Widget>[
-    StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('photos').snapshots(),
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return const CircularProgressIndicator();
-          default:
-            if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              return Expanded(
-                child: ListView.builder(
-                  itemCount: 1,
-                  itemBuilder: (context, index) {
-                    Random random;
-                    random = Random();
-                    index = random.nextInt(snapshot.data!.docs.length);
-                    return photoWidget(snapshot, index);
-                  },
-                ),
-              );
-            }
-        }
-      },
-    )
-  ];
 }
 
 Widget photoWidget(AsyncSnapshot<QuerySnapshot> snapshot, int index) {
