@@ -131,7 +131,7 @@ class _PlayScreenState extends State<PlayScreen> {
                     Navigator.of(context).popUntil((route) => route.isFirst);
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                          builder: (BuildContext context) => HomeScreen()),
+                          builder: (BuildContext context) => const HomeScreen()),
                     );
                     _updateUserScore(); // Call the function to update the user's score
                   },
@@ -143,7 +143,7 @@ class _PlayScreenState extends State<PlayScreen> {
       } else {
         Navigator.of(context).popUntil((route) => route.isFirst);
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (BuildContext context) => HomeScreen()),
+          MaterialPageRoute(builder: (BuildContext context) => const HomeScreen()),
         );
       }
     }
@@ -241,7 +241,7 @@ Widget photoWidget(
 
   return Center(
     child: Card(
-      elevation: 4.0,
+      elevation: 20.0,
       child: InkWell(
         onTap: () {
           showDialog(
