@@ -20,7 +20,6 @@ class _PlayScreenState extends State<PlayScreen> {
   TextEditingController guessController = TextEditingController();
   double multiplier = 1.0;
 
-
   @override
   void initState() {
     super.initState();
@@ -93,8 +92,7 @@ class _PlayScreenState extends State<PlayScreen> {
                 child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context)
-                      .pop(); 
+                  Navigator.of(context).pop();
                   _updateUserScore();
                 },
               ),
@@ -103,22 +101,23 @@ class _PlayScreenState extends State<PlayScreen> {
         },
       );
     } else {
-      fetchImage(); 
+      fetchImage();
     }
 
     guessController.clear();
   }
 
-  void _updateUserScore() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final userDoc =
-          FirebaseFirestore.instance.collection('users').doc(user.uid);
-      final userSnapshot = await userDoc.get();
-      final int userScore = userSnapshot.data()?['score'] ?? 0;
+ void _updateUserScore() async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    final userDoc =
+        FirebaseFirestore.instance.collection('users').doc(user.uid);
+    final userSnapshot = await userDoc.get();
+    final int userScore = userSnapshot.data()?['score'] ?? 0;
 
-      if (score > userScore) {
-        await userDoc.update({'score': score});
+    if (score > userScore) {
+      await userDoc.update({'score': score});
+      if (mounted) {
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -132,7 +131,8 @@ class _PlayScreenState extends State<PlayScreen> {
                     Navigator.of(context).popUntil((route) => route.isFirst);
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                          builder: (BuildContext context) => const HomeScreen()),
+                          builder: (BuildContext context) =>
+                              const HomeScreen()),
                     );
                     _updateUserScore();
                   },
@@ -141,10 +141,13 @@ class _PlayScreenState extends State<PlayScreen> {
             );
           },
         );
-      } else {
+      }
+    } else {
+      if (mounted) {
         Navigator.of(context).popUntil((route) => route.isFirst);
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (BuildContext context) => const HomeScreen()),
+          MaterialPageRoute(
+              builder: (BuildContext context) => const HomeScreen()),
         );
       }
     }
@@ -190,8 +193,7 @@ class _PlayScreenState extends State<PlayScreen> {
             padding: const EdgeInsets.only(right: 10.0),
             child: GestureDetector(
               onTap: () {
-                Navigator.push<void>(
-                  context,
+                Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (BuildContext context) => const ProfileScreen(),
                   ),
