@@ -1,8 +1,8 @@
+import 'package:chicoguesser/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:chicoguesser/leaderboard.dart';
 import 'package:chicoguesser/play.dart';
 import 'package:chicoguesser/upload.dart';
-import 'package:chicoguesser/profile.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

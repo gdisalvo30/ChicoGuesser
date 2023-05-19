@@ -39,30 +39,78 @@ class LeaderboardScreen extends StatelessWidget {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
+          final leaderboardData = snapshot.data!.docs;
           return ListView(
             children: [
               const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'Global Leaderboard',
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
+                child: Center(
+                  child: Text(
+                    'Global Leaderboard',
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-              ...snapshot.data!.docs.map((DocumentSnapshot document) {
-                Map<String, dynamic> data =
-                    document.data() as Map<String, dynamic>;
-                return ListTile(
-                  title: Text(data['id']),
-                  trailing: Text(data['score'].toString()),
-                );
-              }).toList(),
+              for (int i = 0; i < leaderboardData.length; i++)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4.0,
+                    horizontal: 16.0,
+                  ),
+                  child: _buildLeaderboardCard(
+                    leaderboardData[i],
+                    i + 1,
+                  ),
+                ),
             ],
           );
         },
       ),
     );
   }
-}
+
+  Widget _buildLeaderboardCard(DocumentSnapshot document, int position) {
+    final data = document.data() as Map<String, dynamic>;
+    final name = data['id'];
+    final score = data['score'];
+
+    Color? cardColor;
+    switch (position) {
+      case 1:
+        cardColor = Colors.amber;
+        break;
+      case 2:
+        cardColor = Colors.grey[400];
+        break;
+      case 3:
+        cardColor = Colors.brown[300];
+        break;
+      default:
+        cardColor = null; 
+        break;
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Card(
+        color: cardColor,
+        child: ListTile(
+          title: Text(name),
+          trailing: Text(score.toString()),
+        ),
+      ),
+    );
+  }
+}
