@@ -115,40 +115,41 @@ class _PlayScreenState extends State<PlayScreen> {
     final userSnapshot = await userDoc.get();
     final int userScore = userSnapshot.data()?['score'] ?? 0;
 
-    if (score > userScore) {
-      await userDoc.update({'score': score});
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('New High Score!'),
-              content: Text('Your new high score: $score'),
-              actions: [
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              const HomeScreen()),
-                    );
-                    _updateUserScore();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
-    } else {
-      if (mounted) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-        Navigator.of(context).push(
-          MaterialPageRoute(
-              builder: (BuildContext context) => const HomeScreen()),
-        );
+      if (score > userScore) {
+        await userDoc.update({'score': score});
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('New High Score!'),
+                content: Text('Your new high score: $score'),
+                actions: [
+                  TextButton(
+                    child: const Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                const HomeScreen()),
+                      );
+                      _updateUserScore();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      } else {
+        if (mounted) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+          Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (BuildContext context) => const HomeScreen()),
+          );
+        }
       }
     }
   }
@@ -188,6 +189,14 @@ class _PlayScreenState extends State<PlayScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true, // Center the title
+        title: const Text(
+          'Play',
+          style: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: <Widget>[
           Padding(
             padding: const EdgeInsets.only(right: 10.0),
