@@ -65,4 +65,4 @@ class LeaderboardScreen extends StatelessWidget {
       ),
     );
   }
-}
+}
