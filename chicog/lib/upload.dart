@@ -19,16 +19,46 @@ class _UploadScreenState extends State<UploadScreen> {
   final picker = ImagePicker();
   final TextEditingController _nameController = TextEditingController();
 
-  Future<void> _getImageFromCamera() async {
+  Future<void> _takePhotoAndUpload() async {
     final pickedFile = await picker.getImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
       });
+
+      _promptForNameAndUpload();
     } else {
       print('No image selected.');
     }
+  }
+
+  Future<void> _promptForNameAndUpload() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Enter the name of the location'),
+          content: SingleChildScrollView(
+            child: TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                hintText: 'Name',
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _uploadImageToFirestore();
+              },
+              child: const Text('Upload'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _uploadImageToFirestore() async {
@@ -45,7 +75,6 @@ class _UploadScreenState extends State<UploadScreen> {
     await uploadTask.whenComplete(() async {
       String downloadURL = await ref.getDownloadURL();
 
-      // Get current location
       Location location = Location();
       LocationData? currentLocation;
       try {
@@ -58,12 +87,35 @@ class _UploadScreenState extends State<UploadScreen> {
         double latitude = currentLocation.latitude!;
         double longitude = currentLocation.longitude!;
 
-        FirebaseFirestore.instance.collection('photos').add({
-          'downloadURL': downloadURL,
-          'name': fileName,
-          'latitude': latitude,
-          'longitude': longitude,
-        });
+        if (latitude <= 36.0 &&
+            latitude >= 42.0 &&
+            longitude <= -118.0 &&
+            longitude >= -124.0) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Out of Bounds'),
+                content: const Text('You are outside the game upload area.'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          FirebaseFirestore.instance.collection('photos').add({
+            'downloadURL': downloadURL,
+            'name': fileName,
+            'latitude': latitude,
+            'longitude': longitude,
+          });
+        }
       } else {
         print('Unable to get current location.');
       }
@@ -84,46 +136,40 @@ class _UploadScreenState extends State<UploadScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 10.0),
             child: GestureDetector(
-                onTap: () {
-                  Navigator.push<void>(
-                    context,
-                    MaterialPageRoute<void>(
-                        builder: (BuildContext context) =>
-                            const ProfileScreen()),
-                  );
-                },
-                child: const Icon(
-                  Icons.person_sharp,
-                  size: 26.0,
-                )),
+              onTap: () {
+                Navigator.push<void>(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (BuildContext context) => const ProfileScreen(),
+                  ),
+                );
+              },
+              child: const Icon(
+                Icons.person_sharp,
+                size: 26.0,
+              ),
+            ),
           )
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Center(
-            child: _image == null || _image.path == ''
-                ? const Text('No image selected.')
-                : Image.file(_image),
+      body: Container(
+        alignment: Alignment.bottomCenter,
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Center(
+                child: _image == null || _image.path == ''
+                    ? const Text('No image selected.')
+                    : Image.file(_image),
+              ),
+              ElevatedButton(
+                onPressed: _takePhotoAndUpload,
+                child: const Text('Take a Photo and Upload'),
+              ),
+              const SizedBox(height: 50.0),
+            ],
           ),
-          ElevatedButton(
-            onPressed: _getImageFromCamera,
-            child: const Text('Take a Photo'),
-          ),
-          TextField(
-            controller: _nameController,
-            decoration: const InputDecoration(
-              hintText: 'Enter a name for the photo',
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: _uploadImageToFirestore,
-            child: const Text('Upload to Firestore'),
-          ),
-        ],
+        ),
       ),
     );
   }

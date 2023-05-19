@@ -68,13 +68,11 @@ class _LoginScreenState extends State<LoginScreen> {
         password: password,
       );
 
-      // If the login is successful, navigate to the home screen.
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } on FirebaseAuthException catch (e) {
-      // Handle login errors (e.g., display an error message).
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -105,10 +103,8 @@ class _LoginScreenState extends State<LoginScreen> {
         email: email,
         password: password,
       );
-      // Extract the 'id' from the email
       String id = email.split('@')[0];
 
-      // Create a Firestore document for the user
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user!.uid)
@@ -117,16 +113,13 @@ class _LoginScreenState extends State<LoginScreen> {
         'score': 0,
         'email': email,
 
-        // Add more fields as needed
       });
 
-      // If the registration is successful, navigate to the home screen.
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } on FirebaseAuthException catch (e) {
-      // Handle registration errors (e.g., display an error message).
       showDialog(
         context: context,
         builder: (BuildContext context) {
