@@ -10,6 +10,14 @@ class LeaderboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true, // Center the title
+        title: Text(
+          'Global Leaderboard',
+          style: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: <Widget>[
           Padding(
             padding: const EdgeInsets.only(right: 10.0),
@@ -27,7 +35,7 @@ class LeaderboardScreen extends StatelessWidget {
                 size: 26.0,
               ),
             ),
-          )
+          ),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -44,15 +52,6 @@ class LeaderboardScreen extends StatelessWidget {
             children: [
               const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Center(
-                  child: Text(
-                    'Global Leaderboard',
-                    style: TextStyle(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
               ),
               for (int i = 0; i < leaderboardData.length; i++)
                 Padding(

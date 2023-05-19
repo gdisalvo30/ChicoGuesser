@@ -20,7 +20,6 @@ class _PlayScreenState extends State<PlayScreen> {
   TextEditingController guessController = TextEditingController();
   double multiplier = 1.0;
 
-
   @override
   void initState() {
     super.initState();
@@ -93,8 +92,7 @@ class _PlayScreenState extends State<PlayScreen> {
                 child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context)
-                      .pop(); 
+                  Navigator.of(context).pop();
                   _updateUserScore();
                 },
               ),
@@ -103,7 +101,7 @@ class _PlayScreenState extends State<PlayScreen> {
         },
       );
     } else {
-      fetchImage(); 
+      fetchImage();
     }
 
     guessController.clear();
@@ -119,33 +117,39 @@ class _PlayScreenState extends State<PlayScreen> {
 
       if (score > userScore) {
         await userDoc.update({'score': score});
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('New High Score!'),
-              content: Text('Your new high score: $score'),
-              actions: [
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (BuildContext context) => const HomeScreen()),
-                    );
-                    _updateUserScore();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('New High Score!'),
+                content: Text('Your new high score: $score'),
+                actions: [
+                  TextButton(
+                    child: const Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                const HomeScreen()),
+                      );
+                      _updateUserScore();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
       } else {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (BuildContext context) => const HomeScreen()),
-        );
+        if (mounted) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+          Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (BuildContext context) => const HomeScreen()),
+          );
+        }
       }
     }
   }
@@ -185,13 +189,20 @@ class _PlayScreenState extends State<PlayScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true, // Center the title
+        title: const Text(
+          'Play',
+          style: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: <Widget>[
           Padding(
             padding: const EdgeInsets.only(right: 10.0),
             child: GestureDetector(
               onTap: () {
-                Navigator.push<void>(
-                  context,
+                Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (BuildContext context) => const ProfileScreen(),
                   ),
