@@ -152,7 +152,6 @@ class _PlayScreenState extends State<PlayScreen> {
       }
     }
   }
-}
 
   Widget _buildHighScoreMessage() {
     final user = FirebaseAuth.instance.currentUser;
