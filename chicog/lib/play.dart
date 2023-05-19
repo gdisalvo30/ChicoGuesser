@@ -107,13 +107,13 @@ class _PlayScreenState extends State<PlayScreen> {
     guessController.clear();
   }
 
-  void _updateUserScore() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final userDoc =
-          FirebaseFirestore.instance.collection('users').doc(user.uid);
-      final userSnapshot = await userDoc.get();
-      final int userScore = userSnapshot.data()?['score'] ?? 0;
+ void _updateUserScore() async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    final userDoc =
+        FirebaseFirestore.instance.collection('users').doc(user.uid);
+    final userSnapshot = await userDoc.get();
+    final int userScore = userSnapshot.data()?['score'] ?? 0;
 
       if (score > userScore) {
         await userDoc.update({'score': score});
