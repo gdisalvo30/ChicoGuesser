@@ -44,7 +44,7 @@ class LeaderboardScreen extends StatelessWidget {
             children: [
               const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Center( // Center the text
+                child: Center(
                   child: Text(
                     'Global Leaderboard',
                     style: TextStyle(
@@ -80,16 +80,16 @@ class LeaderboardScreen extends StatelessWidget {
     Color? cardColor;
     switch (position) {
       case 1:
-        cardColor = Colors.amber; // Gold
+        cardColor = Colors.amber;
         break;
       case 2:
-        cardColor = Colors.grey[400]; // Silver
+        cardColor = Colors.grey[400];
         break;
       case 3:
-        cardColor = Colors.brown[300]; // Bronze
+        cardColor = Colors.brown[300];
         break;
       default:
-        cardColor = null; // No specific color for other positions
+        cardColor = null; 
         break;
     }
 

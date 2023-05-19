@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:chicoguesser/colors.dart';
-import 'package:chicoguesser/home.dart';
 import 'login_screen.dart';
 
 Future<void> main() async {
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ChicoGuesser',
       theme: ThemeData(primarySwatch: Pallete.myColor),
-      home: const LoginScreen(), // Use the LoginScreen as the home screen
+      home: const LoginScreen(), 
     );
   }
 }

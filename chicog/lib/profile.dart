@@ -13,11 +13,11 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   String _newUsername = '';
-  String? _profileImageUrl; // Updated profile image URL
+  String? _profileImageUrl; 
 
  void _updateUsername() {
   if (_newUsername.trim().isNotEmpty) {
-    // Update the username in Firestore
+
     User? user = FirebaseAuth.instance.currentUser;
     FirebaseFirestore.instance
         .collection('users')
@@ -25,13 +25,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         .update({'id': _newUsername})
         .then((_) {
       setState(() {
-        // Clear the newUsername field after successful update
+
         _newUsername = '';
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Username updated successfully')),
       );
-      Navigator.pop(context); // Close the dialog
+      Navigator.pop(context);
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to update username: $error')),
@@ -52,21 +52,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(Icons.camera_alt),
-              title: Text('Capture Image'),
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Capture Image'),
               onTap: () {
-                // Capture an image from the camera
+
                 Navigator.pop(context);
                 _captureImage();
               },
             ),
             ListTile(
-              leading: Icon(Icons.photo_library),
-              title: Text('Select Image'),
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Select Image'),
               onTap: () {
-                // Select an image from the gallery
+
                 Navigator.pop(context);
-                // Implement your logic for selecting the image
               },
             ),
           ],
@@ -78,18 +77,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _captureImage() async {
     final picker = ImagePicker();
     final image = await picker.getImage(source: ImageSource.camera);
-
     if (image != null) {
-      // Use the captured image
       File imageFile = File(image.path);
-      // Implement your logic for saving and uploading the image
-
-      // Update the profile image URL after successful upload
       setState(() {
         _profileImageUrl = image.path;
       });
-
-      // Update the profileURL field in Firestore
       User? user = FirebaseAuth.instance.currentUser;
       FirebaseFirestore.instance
           .collection('users')
@@ -112,25 +104,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Update Username'),
+          title: const Text('Update Username'),
           content: TextField(
             onChanged: (value) {
               setState(() {
                 _newUsername = value;
               });
             },
-            decoration: InputDecoration(hintText: 'Enter new username'),
+            decoration: const InputDecoration(hintText: 'Enter new username'),
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context); // Close the dialog
+                Navigator.pop(context);
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: _updateUsername,
-              child: Text('Update'),
+              child: const Text('Update'),
             ),
           ],
         );
@@ -177,7 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           String email = userData['email'];
           String username = userData['id'] ?? email.split('@').first;
           int score = userData['score'];
-          _profileImageUrl = userData['profileURL']; // Retrieve profileURL
+          _profileImageUrl = userData['profileURL']; 
 
           return Center(
             child: Padding(
@@ -221,7 +213,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Score: $score',
+                    'High Score: $score',
                     style: const TextStyle(fontSize: 18),
                     textAlign: TextAlign.center,
                   ),

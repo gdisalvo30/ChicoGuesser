@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:chicoguesser/home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:chicoguesser/profile.dart';
@@ -15,75 +16,93 @@ class PlayScreen extends StatefulWidget {
 class _PlayScreenState extends State<PlayScreen> {
   int score = 0;
   int currentIndex = 0;
-  List<DocumentSnapshot>? images;
+  DocumentSnapshot? currentImage;
   TextEditingController guessController = TextEditingController();
+  double multiplier = 1.0;
 
   @override
   void initState() {
     super.initState();
-    fetchImages();
+    fetchImage();
   }
 
-  void fetchImages() async {
+  void fetchImage() async {
     final snapshot =
         await FirebaseFirestore.instance.collection('photos').get();
+    final List<DocumentSnapshot> allImages = snapshot.docs;
+    final int totalImages = allImages.length;
+
+    final random = Random();
+    final int randomIndex = random.nextInt(totalImages);
+    final DocumentSnapshot randomImage = allImages[randomIndex];
+
     setState(() {
-      images = snapshot.docs;
+      currentImage = randomImage;
     });
   }
 
-  void checkAnswer() {
-    String guess = guessController.text;
-    if (images != null && currentIndex < images!.length) {
-      String correctAnswer = images![currentIndex]['name'];
-      if (guess.toLowerCase() == correctAnswer.toLowerCase()) {
-        setState(() {
-          score += 100;
-        });
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Wrong Answer'),
-              content: Text('The correct answer is: $correctAnswer'),
-              actions: [
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
-
+  void checkAnswer(String guess, String correctAnswer) {
+    if (guess.toLowerCase() == correctAnswer.toLowerCase()) {
       setState(() {
-        currentIndex++;
+        score += (100 * multiplier).toInt();
+        multiplier += 0.5;
       });
-    }
-
-    if (currentIndex >= images!.length) {
+    } else {
+      setState(() {
+        multiplier = 1.0;
+      });
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Game Over!'),
-            content: Text('Final Score: $score'),
+            title: const Text('Wrong Answer'),
+            content: Text('The correct answer is: $correctAnswer'),
             actions: [
               TextButton(
                 child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  _updateUserScore(); // Call the function to update the user's score
                 },
               ),
             ],
           );
         },
       );
+    }
+
+    setState(() {
+      currentIndex++;
+    });
+
+    if (currentIndex >= 5) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Game Over!'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Final Score: $score'),
+                _buildHighScoreMessage(),
+              ],
+            ),
+            actions: [
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context)
+                      .pop(); 
+                  _updateUserScore();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      fetchImage(); 
     }
 
     guessController.clear();
@@ -109,15 +128,50 @@ class _PlayScreenState extends State<PlayScreen> {
                 TextButton(
                   child: const Text('OK'),
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (BuildContext context) => const HomeScreen()),
+                    );
+                    _updateUserScore();
                   },
                 ),
               ],
             );
           },
         );
+      } else {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (BuildContext context) => const HomeScreen()),
+        );
       }
     }
+  }
+
+  Widget _buildHighScoreMessage() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return const SizedBox();
+    }
+
+    final userScore = score;
+    final userDoc =
+        FirebaseFirestore.instance.collection('users').doc(user.uid);
+    return FutureBuilder<DocumentSnapshot>(
+      future: userDoc.get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasData) {
+          final int currentHighScore = snapshot.data?['score'] ?? 0;
+          if (userScore > currentHighScore) {
+            return const Text('New High Score!');
+          }
+        }
+        return const SizedBox();
+      },
+    );
   }
 
   @override
@@ -152,32 +206,22 @@ class _PlayScreenState extends State<PlayScreen> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Expanded(
-              flex: 0,
-              child: TextField(
-                controller: guessController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Guess',
-                ),
-                onEditingComplete: checkAnswer,
-              ),
-            ),
-            Expanded(
-              flex: 10,
-              child: images != null && currentIndex < images!.length
-                  ? photoWidget(images![currentIndex])
-                  : const CircularProgressIndicator(),
-            ),
-            BottomAppBar(
-              child: Text(
-                "Score: $score",
-                style: const TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                ),
+            currentImage != null
+                ? photoWidget(
+                    context,
+                    currentImage!,
+                    guessController,
+                    checkAnswer,
+                  )
+                : const CircularProgressIndicator(),
+            const SizedBox(height: 10),
+            Text(
+              "Score: $score",
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
@@ -187,14 +231,50 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 }
 
-Widget photoWidget(DocumentSnapshot image) {
-  try {
-    return Column(
-      children: [
-        Image.network(image['downloadURL']),
-      ],
-    );
-  } catch (e) {
-    return Text('Error: $e');
-  }
+Widget photoWidget(
+  BuildContext context,
+  DocumentSnapshot image,
+  TextEditingController guessController,
+  void Function(String, String) checkAnswer,
+) {
+  final String correctAnswer = image['name'];
+
+  return Center(
+    child: Card(
+      elevation: 20.0,
+      child: InkWell(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Make a Guess'),
+                content: TextField(
+                  controller: guessController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Guess',
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    child: const Text('Submit'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      checkAnswer(guessController.text, correctAnswer);
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        child: Column(
+          children: [
+            Image.network(image['downloadURL']),
+          ],
+        ),
+      ),
+    ),
+  );
 }
